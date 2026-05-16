@@ -19,7 +19,7 @@ export default function SelectProductPage() {
     fetch('/api/printful/products')
       .then((r) => r.json())
       .then((data) => {
-        setProducts(data.result || []);
+        setProducts(Array.isArray(data.result) ? data.result : []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
