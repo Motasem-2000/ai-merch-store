@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         inputs: enhancedPrompt,
-        parameters: { width: 1024, height: 1024, guidance_scale: 7.5 },
+        parameters: { width: 1024, height: 1024 },
       }),
     });
 
