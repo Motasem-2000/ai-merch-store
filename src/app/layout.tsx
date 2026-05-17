@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/navbar";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,7 +15,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Merch Factory",
+  title: {
+    default: "AI Merch Factory",
+    template: "%s | AI Merch Factory",
+  },
   description: "AI-powered merchandise store that turns text prompts into physical products",
 };
 
@@ -27,7 +32,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Navbar />
+        <ErrorBoundary>
+          <main className="flex-1">{children}</main>
+        </ErrorBoundary>
+      </body>
     </html>
   );
 }
