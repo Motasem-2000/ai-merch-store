@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json({
       success: false,
       error: 'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. Check your .env.local file.',
-    });
+    }, { status: 500 });
   }
 
   try {
@@ -20,7 +20,7 @@ export async function GET() {
       return NextResponse.json({
         success: false,
         error: `Supabase query failed: ${error.message}. Make sure you have run schema.sql in the Supabase SQL Editor.`,
-      });
+      }, { status: 502 });
     }
 
     return NextResponse.json({
@@ -33,6 +33,6 @@ export async function GET() {
     return NextResponse.json({
       success: false,
       error: `Connection failed: ${message}. Verify your Supabase URL and anon key.`,
-    });
+    }, { status: 502 });
   }
 }

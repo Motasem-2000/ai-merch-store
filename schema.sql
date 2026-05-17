@@ -108,6 +108,10 @@ CREATE POLICY "Authenticated users can update products"
   ON products FOR UPDATE
   USING (auth.uid() IS NOT NULL);
 
+CREATE POLICY "Authenticated users can delete products"
+  ON products FOR DELETE
+  USING (auth.uid() IS NOT NULL);
+
 -- Orders: users can CRUD their own orders
 CREATE POLICY "Users can view their own orders"
   ON orders FOR SELECT
