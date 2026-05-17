@@ -68,6 +68,10 @@ CREATE POLICY "Users can view their own designs"
   ON designs FOR SELECT
   USING (auth.uid() = user_id);
 
+CREATE POLICY "Anyone can view completed designs"
+  ON designs FOR SELECT
+  USING (status = 'completed');
+
 CREATE POLICY "Users can insert their own designs"
   ON designs FOR INSERT
   WITH CHECK (auth.uid() = user_id);
