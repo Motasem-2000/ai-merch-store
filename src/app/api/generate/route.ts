@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createSupabaseServerClient, createSupabaseAdmin } from '@/lib/supabase-server';
 
 const HF_API_URL = 'https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell';
 
@@ -38,6 +38,16 @@ async function enhancePromptWithGemini(userPrompt: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'You must be signed in to generate designs.' },
+        { status: 401 },
+      );
+    }
+
     const { prompt } = await req.json();
     if (!prompt) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
@@ -67,29 +77,26 @@ export async function POST(req: NextRequest) {
     const imageUrl = `data:image/png;base64,${base64Image}`;
 
     const design: Record<string, unknown> = {
+      user_id: user.id,
       prompt,
       enhanced_prompt: enhancedPrompt,
       image_url: imageUrl,
       status: 'completed',
     };
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (supabaseUrl && supabaseKey) {
-      try {
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        const { data, error } = await supabase
-          .from('designs')
-          .insert(design)
-          .select()
-          .single();
-        if (!error && data) {
-          return NextResponse.json({ design: data });
-        }
-        console.warn('Supabase insert failed, returning design without DB save:', error?.message);
-      } catch (dbErr) {
-        console.warn('Supabase error, returning design without DB save:', dbErr);
+    try {
+      const adminClient = createSupabaseAdmin();
+      const { data, error } = await adminClient
+        .from('designs')
+        .insert(design)
+        .select()
+        .single();
+      if (!error && data) {
+        return NextResponse.json({ design: data });
       }
+      console.warn('Supabase insert failed, returning design without DB save:', error?.message);
+    } catch (dbErr) {
+      console.warn('Supabase error, returning design without DB save:', dbErr);
     }
 
     return NextResponse.json({ design });
