@@ -17,10 +17,19 @@
   <img src="public/demo.gif" alt="AI Merch Factory Demo" width="700" />
 </p>
 
+<p align="center">
+  <a href="https://ai-merch-store.vercel.app">
+    <img src="https://vercel.com/button" alt="Deploy with Vercel" />
+  </a>
+</p>
+
+🚀 **Live Demo:** [ai-merch-store.vercel.app](https://ai-merch-store.vercel.app)
+
 ---
 
 ## 📑 Table of Contents
 
+- [🚀 Live Demo](#-live-demo)
 - [✨ Features](#-features)
 - [🛠 Tech Stack](#-tech-stack)
 - [📁 Project Structure](#-project-structure)
