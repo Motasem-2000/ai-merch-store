@@ -41,9 +41,7 @@ export const useCartStore = create<CartState>()(
           set({ items: get().items.filter((i) => i.id !== id) });
         } else {
           set({
-            items: get().items.map((i) =>
-              i.id === id ? { ...i, quantity } : i
-            ),
+            items: get().items.map((i) => (i.id === id ? { ...i, quantity } : i)),
           });
         }
       },
@@ -52,8 +50,7 @@ export const useCartStore = create<CartState>()(
 
       totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
 
-      totalPrice: () =>
-        get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+      totalPrice: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
     }),
     { name: 'ai-merch-cart' }
   )

@@ -52,28 +52,32 @@ export default function SelectProductPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-3xl font-bold text-center mb-8">Choose Your Product</h1>
+      <h1 className="mb-8 text-center text-3xl font-bold">Choose Your Product</h1>
       {loading ? (
         <p className="text-center">Loading catalog...</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
           {products.slice(0, 9).map((p) => (
             <Card
               key={p.id}
-              className={`p-4 cursor-pointer ${
+              className={`cursor-pointer p-4 ${
                 selected?.id === p.id ? 'ring-2 ring-purple-500' : ''
               }`}
               onClick={() => setSelected(p)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.thumbnail_url} alt={p.name} className="w-full h-48 object-cover rounded mb-4" />
+              <img
+                src={p.thumbnail_url}
+                alt={p.name}
+                className="mb-4 h-48 w-full rounded object-cover"
+              />
               <h3 className="font-semibold">{p.name}</h3>
             </Card>
           ))}
         </div>
       )}
       {selected && (
-        <div className="text-center mt-8">
+        <div className="mt-8 text-center">
           <Button onClick={handleOrder} size="lg">
             Order Now
           </Button>

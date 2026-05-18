@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { generateSchema } from '@/lib/validations';
 
 const HF_API_URL = 'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev';
 
+/**
+ * Enhances a user prompt using Google Gemini for better image generation results.
+ * Returns the refined prompt text suitable for FLUX.1.
+ */
 async function enhancePromptWithGemini(userPrompt: string): Promise<string> {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   const res = await fetch(
@@ -11,11 +16,15 @@ async function enhancePromptWithGemini(userPrompt: string): Promise<string> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `You are an expert prompt engineer for image generation. Take a user's description and refine it into a vivid, artistic, high-quality prompt suitable for FLUX.1. Add details about lighting, color palette, art style, composition, and mood. Return only the refined prompt, nothing else.\n\nUser description: "${userPrompt}"`
-          }]
-        }]
+        contents: [
+          {
+            parts: [
+              {
+                text: `You are an expert prompt engineer for image generation. Take a user's description and refine it into a vivid, artistic, high-quality prompt suitable for FLUX.1. Add details about lighting, color palette, art style, composition, and mood. Return only the refined prompt, nothing else.\n\nUser description: "${userPrompt}"`,
+              },
+            ],
+          },
+        ],
       }),
     }
   );
@@ -23,19 +32,26 @@ async function enhancePromptWithGemini(userPrompt: string): Promise<string> {
   return data.candidates[0].content.parts[0].text;
 }
 
+/**
+ * POST /api/generate
+ * Accepts a text prompt, enhances it via Gemini, generates an image via FLUX.1,
+ * and stores the design in Supabase.
+ */
 export async function POST(req: NextRequest) {
   try {
-    const { prompt } = await req.json();
-    if (!prompt) {
-      return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
+    const body = await req.json();
+    const parsed = generateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
 
+    const { prompt } = parsed.data;
     const enhancedPrompt = await enhancePromptWithGemini(prompt);
 
     const imageRes = await fetch(HF_API_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.HF_API_KEY}`,
+        Authorization: `Bearer ${process.env.HF_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

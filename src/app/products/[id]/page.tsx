@@ -53,7 +53,7 @@ export default function ProductDetailPage() {
   if (error || !product) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-16 text-center">
-        <h1 className="text-2xl font-bold text-destructive">{error ?? 'Product not found'}</h1>
+        <h1 className="text-destructive text-2xl font-bold">{error ?? 'Product not found'}</h1>
         <Link href="/products">
           <Button variant="outline">Back to Products</Button>
         </Link>
@@ -62,12 +62,15 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-8">
-      <Link href="/products" className="text-sm text-muted-foreground hover:underline mb-4 inline-block">
+    <div className="mx-auto max-w-5xl p-4 sm:p-8">
+      <Link
+        href="/products"
+        className="text-muted-foreground mb-4 inline-block text-sm hover:underline"
+      >
         ← Back to Products
       </Link>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div className="bg-muted relative aspect-square overflow-hidden rounded-xl">
           {product.image_url ? (
             <Image
               src={product.image_url}
@@ -77,7 +80,7 @@ export default function ProductDetailPage() {
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-muted-foreground text-lg">
+            <div className="text-muted-foreground flex h-full items-center justify-center text-lg">
               No Image Available
             </div>
           )}
@@ -86,21 +89,21 @@ export default function ProductDetailPage() {
           <CardContent className="space-y-6 p-6">
             <div>
               <h1 className="text-3xl font-bold">{product.name}</h1>
-              <p className="text-2xl font-semibold text-purple-600 mt-2">
+              <p className="mt-2 text-2xl font-semibold text-purple-600">
                 ${Number(product.price).toFixed(2)}
               </p>
             </div>
-            {product.description && (
-              <p className="text-muted-foreground">{product.description}</p>
-            )}
+            {product.description && <p className="text-muted-foreground">{product.description}</p>}
             <div>
-              <p className="text-sm font-medium mb-1">
+              <p className="mb-1 text-sm font-medium">
                 Stock: {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}
               </p>
             </div>
             {product.stock > 0 && (
               <div className="flex items-center gap-3">
-                <label htmlFor="qty" className="text-sm font-medium">Quantity:</label>
+                <label htmlFor="qty" className="text-sm font-medium">
+                  Quantity:
+                </label>
                 <Input
                   id="qty"
                   type="number"

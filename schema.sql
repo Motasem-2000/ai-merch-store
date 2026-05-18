@@ -56,6 +56,16 @@ CREATE TABLE IF NOT EXISTS order_items (
 );
 
 -- ==============================================
+-- Performance Indexes
+-- ==============================================
+
+CREATE INDEX IF NOT EXISTS idx_orders_user_status ON orders (user_id, status);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_product ON order_items (order_id, product_id);
+CREATE INDEX IF NOT EXISTS idx_products_name ON products (name);
+CREATE INDEX IF NOT EXISTS idx_products_created_at ON products (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_designs_user_status ON designs (user_id, status);
+
+-- ==============================================
 -- Row Level Security (RLS) Policies
 -- ==============================================
 

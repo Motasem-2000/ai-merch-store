@@ -28,8 +28,8 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         this.props.fallback ?? (
           <div className="flex flex-col items-center justify-center gap-4 p-8 text-center">
-            <h2 className="text-xl font-semibold text-destructive">Something went wrong</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-destructive text-xl font-semibold">Something went wrong</h2>
+            <p className="text-muted-foreground text-sm">
               {this.state.error?.message ?? 'An unexpected error occurred.'}
             </p>
             <Button onClick={() => this.setState({ hasError: false, error: null })}>

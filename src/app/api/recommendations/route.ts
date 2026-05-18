@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { recommendationsSchema } from '@/lib/validations';
 
+/**
+ * POST /api/recommendations
+ * Accepts an array of product names (from the user's cart) and returns
+ * 2-3 AI-recommended products using Google Gemini. Falls back to
+ * random non-cart products when Gemini is unavailable.
+ */
 export async function POST(req: NextRequest) {
   try {
-    const { productNames } = await req.json();
-    if (!productNames || !Array.isArray(productNames) || productNames.length === 0) {
+    const body = await req.json();
+    const parsed = recommendationsSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json({ recommendations: [] });
     }
+
+    const { productNames } = parsed.data;
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,9 +35,7 @@ export async function POST(req: NextRequest) {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
     if (!GEMINI_API_KEY) {
-      const otherProducts = allProducts.filter(
-        (p) => !productNames.includes(p.name)
-      );
+      const otherProducts = allProducts.filter((p) => !productNames.includes(p.name));
       return NextResponse.json({
         recommendations: otherProducts.slice(0, 3),
       });
@@ -53,25 +61,20 @@ export async function POST(req: NextRequest) {
     );
 
     const geminiData = await geminiRes.json();
-    const text =
-      geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]';
+    const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]';
 
     let recommendedNames: string[];
     try {
       const cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
       recommendedNames = JSON.parse(cleaned);
     } catch {
-      const otherProducts = allProducts.filter(
-        (p) => !productNames.includes(p.name)
-      );
+      const otherProducts = allProducts.filter((p) => !productNames.includes(p.name));
       return NextResponse.json({
         recommendations: otherProducts.slice(0, 3),
       });
     }
 
-    const recommendations = allProducts.filter((p) =>
-      recommendedNames.includes(p.name)
-    );
+    const recommendations = allProducts.filter((p) => recommendedNames.includes(p.name));
 
     return NextResponse.json({ recommendations });
   } catch (error) {
