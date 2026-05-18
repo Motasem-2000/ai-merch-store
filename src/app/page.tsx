@@ -53,43 +53,39 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+      <div className="mx-auto max-w-4xl space-y-8">
+        <div className="space-y-4 text-center">
+          <h1 className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-4xl font-bold text-transparent sm:text-5xl">
             AI Merch Factory
           </h1>
-          <p className="text-lg sm:text-xl text-gray-600">
+          <p className="text-lg text-gray-600 sm:text-xl">
             Describe your idea, and we&apos;ll turn it into a unique physical product.
           </p>
         </div>
 
-        <Card className="p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <Card className="space-y-4 p-6">
+          <div className="flex flex-col gap-4 sm:flex-row">
             <Input
               placeholder="e.g., A cat wearing a wizard hat in Van Gogh style"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               className="flex-1 text-lg"
             />
-            <Button
-              onClick={handleGenerate}
-              disabled={!prompt || isGenerating}
-              size="lg"
-            >
+            <Button onClick={handleGenerate} disabled={!prompt || isGenerating} size="lg">
               {isGenerating ? 'Generating...' : 'Create Magic'}
             </Button>
           </div>
         </Card>
 
         {generatedImage && (
-          <Card className="p-6 space-y-4">
-            <h2 className="text-2xl font-bold text-center">Your Unique Design</h2>
-            <div className="relative w-full aspect-square max-w-md mx-auto">
+          <Card className="space-y-4 p-6">
+            <h2 className="text-center text-2xl font-bold">Your Unique Design</h2>
+            <div className="relative mx-auto aspect-square w-full max-w-md">
               <Image
                 src={generatedImage}
                 alt="Generated design"
                 fill
-                className="object-contain rounded-lg"
+                className="rounded-lg object-contain"
                 unoptimized
               />
             </div>
@@ -115,12 +111,12 @@ export default function HomePage() {
               <CardTitle>Recommended for You</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {recommendations.map((p) => (
                   <Link key={p.id} href={`/products/${p.id}`} className="block">
-                    <Card className="p-3 hover:ring-2 hover:ring-purple-500 transition-all">
+                    <Card className="p-3 transition-all hover:ring-2 hover:ring-purple-500">
                       <p className="font-medium">{p.name}</p>
-                      <p className="text-sm text-muted-foreground">${Number(p.price).toFixed(2)}</p>
+                      <p className="text-muted-foreground text-sm">${Number(p.price).toFixed(2)}</p>
                     </Card>
                   </Link>
                 ))}

@@ -18,17 +18,15 @@ function ThankYouContent() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">Your order has been placed successfully.</p>
-          {orderId && (
-            <p className="text-sm font-mono bg-muted p-2 rounded">
-              Order ID: {orderId}
-            </p>
-          )}
+          {orderId && <p className="bg-muted rounded p-2 font-mono text-sm">Order ID: {orderId}</p>}
           <div className="flex flex-col gap-2 pt-4">
             <Link href="/products">
               <Button className="w-full">Continue Shopping</Button>
             </Link>
             <Link href="/">
-              <Button variant="outline" className="w-full">Back to Home</Button>
+              <Button variant="outline" className="w-full">
+                Back to Home
+              </Button>
             </Link>
           </div>
         </CardContent>

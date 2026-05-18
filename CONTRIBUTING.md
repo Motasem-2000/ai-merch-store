@@ -57,13 +57,13 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 Use the following prefixes for your branches:
 
-| Prefix | Use Case | Example |
-| --- | --- | --- |
-| `feature/` | New features | `feature/user-dashboard` |
-| `fix/` | Bug fixes | `fix/printful-auth-error` |
-| `docs/` | Documentation changes | `docs/update-readme` |
-| `refactor/` | Code refactoring | `refactor/api-error-handling` |
-| `chore/` | Maintenance tasks | `chore/update-dependencies` |
+| Prefix      | Use Case              | Example                       |
+| ----------- | --------------------- | ----------------------------- |
+| `feature/`  | New features          | `feature/user-dashboard`      |
+| `fix/`      | Bug fixes             | `fix/printful-auth-error`     |
+| `docs/`     | Documentation changes | `docs/update-readme`          |
+| `refactor/` | Code refactoring      | `refactor/api-error-handling` |
+| `chore/`    | Maintenance tasks     | `chore/update-dependencies`   |
 
 ---
 
@@ -141,15 +141,15 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 
 ### Types
 
-| Type | Description |
-| --- | --- |
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation changes |
-| `style` | Formatting (no code change) |
-| `refactor` | Code restructuring |
-| `test` | Adding or updating tests |
-| `chore` | Maintenance tasks |
+| Type       | Description                 |
+| ---------- | --------------------------- |
+| `feat`     | New feature                 |
+| `fix`      | Bug fix                     |
+| `docs`     | Documentation changes       |
+| `style`    | Formatting (no code change) |
+| `refactor` | Code restructuring          |
+| `test`     | Adding or updating tests    |
+| `chore`    | Maintenance tasks           |
 
 ### Examples
 

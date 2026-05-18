@@ -27,7 +27,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 sm:p-8 space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Shopping Cart</h1>
         <Button variant="ghost" size="sm" onClick={clearCart}>
@@ -39,25 +39,44 @@ export default function CartPage() {
         {items.map((item) => (
           <Card key={item.id}>
             <CardContent className="flex items-center gap-4 p-4">
-              <div className="relative size-20 shrink-0 rounded-lg overflow-hidden bg-muted">
+              <div className="bg-muted relative size-20 shrink-0 overflow-hidden rounded-lg">
                 {item.image_url ? (
-                  <Image src={item.image_url} alt={item.name} fill className="object-cover" sizes="80px" />
+                  <Image
+                    src={item.image_url}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No img</div>
+                  <div className="text-muted-foreground flex h-full items-center justify-center text-xs">
+                    No img
+                  </div>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <Link href={`/products/${item.id}`} className="font-medium hover:underline line-clamp-1">
+              <div className="min-w-0 flex-1">
+                <Link
+                  href={`/products/${item.id}`}
+                  className="line-clamp-1 font-medium hover:underline"
+                >
                   {item.name}
                 </Link>
-                <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
+                <p className="text-muted-foreground text-sm">${item.price.toFixed(2)}</p>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="outline" size="icon-sm" onClick={() => updateQuantity(item.id, item.quantity - 1)}>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                >
                   <Minus className="size-3" />
                 </Button>
                 <span className="w-8 text-center text-sm">{item.quantity}</span>
-                <Button variant="outline" size="icon-sm" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                >
                   <Plus className="size-3" />
                 </Button>
               </div>
@@ -65,7 +84,7 @@ export default function CartPage() {
                 ${(item.price * item.quantity).toFixed(2)}
               </p>
               <Button variant="ghost" size="icon-sm" onClick={() => removeItem(item.id)}>
-                <Trash2 className="size-4 text-destructive" />
+                <Trash2 className="text-destructive size-4" />
               </Button>
             </CardContent>
           </Card>
@@ -83,7 +102,7 @@ export default function CartPage() {
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Shipping</span>
-            <span className="text-sm text-muted-foreground">Calculated at checkout</span>
+            <span className="text-muted-foreground text-sm">Calculated at checkout</span>
           </div>
         </CardContent>
         <CardFooter className="flex-col gap-2">

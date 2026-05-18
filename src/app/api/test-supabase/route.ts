@@ -6,10 +6,14 @@ export async function GET() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    return NextResponse.json({
-      success: false,
-      error: 'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. Check your .env.local file.',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. Check your .env.local file.',
+      },
+      { status: 500 }
+    );
   }
 
   try {
@@ -17,10 +21,13 @@ export async function GET() {
     const { error } = await supabase.from('products').select('id').limit(1);
 
     if (error) {
-      return NextResponse.json({
-        success: false,
-        error: `Supabase query failed: ${error.message}. Make sure you have run schema.sql in the Supabase SQL Editor.`,
-      }, { status: 502 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Supabase query failed: ${error.message}. Make sure you have run schema.sql in the Supabase SQL Editor.`,
+        },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({
@@ -30,9 +37,12 @@ export async function GET() {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    return NextResponse.json({
-      success: false,
-      error: `Connection failed: ${message}. Verify your Supabase URL and anon key.`,
-    }, { status: 502 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: `Connection failed: ${message}. Verify your Supabase URL and anon key.`,
+      },
+      { status: 502 }
+    );
   }
 }

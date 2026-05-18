@@ -1,15 +1,17 @@
 const PRINTFUL_API_URL = 'https://api.printful.com';
 
 const headers = () => ({
-  'Authorization': `Bearer ${process.env.PRINTFUL_API_KEY}`,
+  Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}`,
   'Content-Type': 'application/json',
 });
 
+/** Fetches the full Printful product catalog. */
 export async function getCatalogProducts() {
   const res = await fetch(`${PRINTFUL_API_URL}/catalog/products`, { headers: headers() });
   return res.json();
 }
 
+/** Fetches available variants for a specific Printful catalog product. */
 export async function getProductVariants(productId: number) {
   const res = await fetch(`${PRINTFUL_API_URL}/catalog/products/${productId}/variants`, {
     headers: headers(),
@@ -17,6 +19,7 @@ export async function getProductVariants(productId: number) {
   return res.json();
 }
 
+/** Creates a new store product on Printful with a design image applied to a variant. */
 export async function createStoreProduct(
   designImageUrl: string,
   variantId: number,
@@ -43,6 +46,7 @@ export async function createStoreProduct(
   return res.json();
 }
 
+/** Places a Printful order for a variant with the given shipping info. */
 export async function createOrder(
   variantId: number,
   shippingInfo: {
@@ -65,6 +69,7 @@ export async function createOrder(
   return res.json();
 }
 
+/** Fetches estimated shipping rates for a variant to a given country. */
 export async function getShippingRates(variantId: number, countryCode: string) {
   const res = await fetch(`${PRINTFUL_API_URL}/shipping/rates`, {
     method: 'POST',

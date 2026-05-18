@@ -15,7 +15,9 @@ export function Navbar() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
     return () => subscription.unsubscribe();
@@ -27,25 +29,34 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <Link
+          href="/"
+          className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-lg font-bold text-transparent"
+        >
           AI Merch Factory
         </Link>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-4 md:flex">
-          <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/"
+            className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+          >
             Home
           </Link>
-          <Link href="/products" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/products"
+            className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+          >
             Products
           </Link>
           <Link href="/cart" className="relative">
             <Button variant="ghost" size="icon">
               <ShoppingCart className="size-5" />
               {totalItems > 0 && (
-                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white">
+                <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white">
                   {totalItems}
                 </span>
               )}
@@ -53,7 +64,7 @@ export function Navbar() {
           </Link>
           {user ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">{user.email}</span>
+              <span className="text-muted-foreground text-sm">{user.email}</span>
               <Button variant="ghost" size="icon" onClick={handleLogout} title="Log out">
                 <LogOut className="size-4" />
               </Button>
@@ -69,26 +80,43 @@ export function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={() => setMobileOpen(!mobileOpen)}
+        >
           {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
         </Button>
       </div>
 
       {/* Mobile nav */}
       {mobileOpen && (
-        <div className="border-t px-4 py-3 space-y-2 md:hidden">
-          <Link href="/" className="block text-sm py-1" onClick={() => setMobileOpen(false)}>Home</Link>
-          <Link href="/products" className="block text-sm py-1" onClick={() => setMobileOpen(false)}>Products</Link>
-          <Link href="/cart" className="block text-sm py-1" onClick={() => setMobileOpen(false)}>
+        <div className="space-y-2 border-t px-4 py-3 md:hidden">
+          <Link href="/" className="block py-1 text-sm" onClick={() => setMobileOpen(false)}>
+            Home
+          </Link>
+          <Link
+            href="/products"
+            className="block py-1 text-sm"
+            onClick={() => setMobileOpen(false)}
+          >
+            Products
+          </Link>
+          <Link href="/cart" className="block py-1 text-sm" onClick={() => setMobileOpen(false)}>
             Cart {totalItems > 0 && `(${totalItems})`}
           </Link>
           {user ? (
             <>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>Log out</Button>
+              <p className="text-muted-foreground text-sm">{user.email}</p>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                Log out
+              </Button>
             </>
           ) : (
-            <Link href="/login" className="block text-sm py-1" onClick={() => setMobileOpen(false)}>Login</Link>
+            <Link href="/login" className="block py-1 text-sm" onClick={() => setMobileOpen(false)}>
+              Login
+            </Link>
           )}
         </div>
       )}
