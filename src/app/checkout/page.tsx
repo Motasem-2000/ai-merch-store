@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/loading-spinner';
 import { useCartStore } from '@/store/cartStore';
 import { supabase } from '@/lib/supabase';
+import { checkoutSchema } from '@/lib/validations';
 import type { User } from '@supabase/supabase-js';
 
 export default function CheckoutPage() {
@@ -44,7 +45,9 @@ export default function CheckoutPage() {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-16 text-center">
         <h1 className="text-2xl font-bold">Your cart is empty</h1>
-        <Button onClick={() => router.push('/products')}>Browse Products</Button>
+        <Button onClick={() => router.push('/products')}>
+          Browse Products
+        </Button>
       </div>
     );
   }
@@ -54,7 +57,46 @@ export default function CheckoutPage() {
     setSubmitting(true);
     setError(null);
 
+    // Validate shipping form
+    const validation = checkoutSchema.safeParse({
+      fullName,
+      address,
+      city,
+      postalCode,
+    });
+    if (!validation.success) {
+      setError(validation.error.issues[0].message);
+      setSubmitting(false);
+      return;
+    }
+
     try {
+      // Check stock availability before placing the order
+      for (const item of items) {
+        const { data: product } = await supabase
+          .from('products')
+          .select('stock, name')
+          .eq('id', item.id)
+          .single();
+
+        if (!product) {
+          setError(`Product "${item.name}" is no longer available.`);
+          setSubmitting(false);
+          return;
+        }
+
+        if (product.stock < item.quantity) {
+          setError(
+            product.stock === 0
+              ? `"${product.name}" is out of stock.`
+              : `Only ${product.stock} of "${product.name}" available (you requested ${item.quantity}).`,
+          );
+          setSubmitting(false);
+          return;
+        }
+      }
+
+      // Create the order
       const { data: order, error: orderErr } = await supabase
         .from('orders')
         .insert({
@@ -69,6 +111,7 @@ export default function CheckoutPage() {
 
       if (orderErr) throw orderErr;
 
+      // Insert order items
       const orderItems = items.map((item) => ({
         order_id: order.id,
         product_id: item.id,
@@ -76,8 +119,21 @@ export default function CheckoutPage() {
         price: item.price,
       }));
 
-      const { error: itemsErr } = await supabase.from('order_items').insert(orderItems);
+      const { error: itemsErr } = await supabase
+        .from('order_items')
+        .insert(orderItems);
       if (itemsErr) throw itemsErr;
+
+      // Decrement stock for each purchased item
+      for (const item of items) {
+        const { error: stockErr } = await supabase.rpc('decrement_stock', {
+          p_product_id: item.id,
+          p_quantity: item.quantity,
+        });
+        if (stockErr) {
+          console.error('Stock decrement failed:', stockErr);
+        }
+      }
 
       clearCart();
       router.push(`/thank-you?orderId=${order.id}`);
@@ -88,31 +144,63 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-4 sm:p-8">
-      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="mx-auto max-w-3xl p-4 sm:p-8">
+      <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Shipping Address</CardTitle>
           </CardHeader>
           <CardContent>
-            <form id="checkout-form" onSubmit={handleSubmit} className="space-y-4">
+            <form
+              id="checkout-form"
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
               {error && <p className="text-sm text-destructive">{error}</p>}
               <div className="space-y-2">
-                <label htmlFor="fullName" className="text-sm font-medium">Full Name</label>
-                <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+                <label htmlFor="fullName" className="text-sm font-medium">
+                  Full Name
+                </label>
+                <Input
+                  id="fullName"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
               </div>
               <div className="space-y-2">
-                <label htmlFor="address" className="text-sm font-medium">Address</label>
-                <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} required />
+                <label htmlFor="address" className="text-sm font-medium">
+                  Address
+                </label>
+                <Input
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                />
               </div>
               <div className="space-y-2">
-                <label htmlFor="city" className="text-sm font-medium">City</label>
-                <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} required />
+                <label htmlFor="city" className="text-sm font-medium">
+                  City
+                </label>
+                <Input
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                />
               </div>
               <div className="space-y-2">
-                <label htmlFor="postalCode" className="text-sm font-medium">Postal Code</label>
-                <Input id="postalCode" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required />
+                <label htmlFor="postalCode" className="text-sm font-medium">
+                  Postal Code
+                </label>
+                <Input
+                  id="postalCode"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                  required
+                />
               </div>
             </form>
           </CardContent>
@@ -125,11 +213,13 @@ export default function CheckoutPage() {
           <CardContent className="space-y-4">
             {items.map((item) => (
               <div key={item.id} className="flex justify-between text-sm">
-                <span>{item.name} × {item.quantity}</span>
+                <span>
+                  {item.name} × {item.quantity}
+                </span>
                 <span>${(item.price * item.quantity).toFixed(2)}</span>
               </div>
             ))}
-            <div className="border-t pt-4 flex justify-between font-bold text-lg">
+            <div className="flex justify-between border-t pt-4 text-lg font-bold">
               <span>Total</span>
               <span>${totalPrice.toFixed(2)}</span>
             </div>
