@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { recommendationsSchema } from '@/lib/validations';
+import { API_ENDPOINTS } from '@/lib/constants/config';
 
 export async function POST(req: NextRequest) {
   try {
-    const { productNames } = await req.json();
-    if (!productNames || !Array.isArray(productNames) || productNames.length === 0) {
+    const body = await req.json();
+    const parsed = recommendationsSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json({ recommendations: [] });
     }
 
+    const { productNames } = parsed.data;
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
     );
 
     const { data: allProducts } = await supabase
@@ -26,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     if (!GEMINI_API_KEY) {
       const otherProducts = allProducts.filter(
-        (p) => !productNames.includes(p.name)
+        (p) => !productNames.includes(p.name),
       );
       return NextResponse.json({
         recommendations: otherProducts.slice(0, 3),
@@ -34,7 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+      `${API_ENDPOINTS.GEMINI}?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -49,7 +54,7 @@ export async function POST(req: NextRequest) {
             },
           ],
         }),
-      }
+      },
     );
 
     const geminiData = await geminiRes.json();
@@ -62,7 +67,7 @@ export async function POST(req: NextRequest) {
       recommendedNames = JSON.parse(cleaned);
     } catch {
       const otherProducts = allProducts.filter(
-        (p) => !productNames.includes(p.name)
+        (p) => !productNames.includes(p.name),
       );
       return NextResponse.json({
         recommendations: otherProducts.slice(0, 3),
@@ -70,7 +75,7 @@ export async function POST(req: NextRequest) {
     }
 
     const recommendations = allProducts.filter((p) =>
-      recommendedNames.includes(p.name)
+      recommendedNames.includes(p.name),
     );
 
     return NextResponse.json({ recommendations });
